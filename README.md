@@ -1,103 +1,112 @@
 # Oracle-Based SQL Injection Lab on Oracle Database 23ai
 
-> A Dockerized Oracle 23ai migration of a MySQL-oriented SQL injection teaching lab, preserving the original learning workflow while rebuilding the backend around Oracle initialization, FREEPDB1, OCI8-based PHP connectivity, and prepared-statement defense.
+> A Dockerized migration of a MySQL-oriented SQL injection lab to Oracle Database 23ai, rebuilt to preserve the original learning workflow while adapting the backend for Oracle initialization, FREEPDB1, OCI8-based PHP connectivity, and prepared-statement defense.
 
-## Overview
+## Project snapshot
 
-This repository contains my MEng capstone project completed at the University of Cincinnati.
+This repository contains my MEng capstone project at the University of Cincinnati.
 
-The project recreates an SQL injection lab originally designed for MySQL and ports it to **Oracle Database 23ai** while keeping the user-facing web workflow and learning objective intact. The work goes beyond a simple database swap. It required Oracle-specific environment design, schema initialization, seeded data setup, PHP-to-Oracle integration through OCI8, browser and command-line validation, and a secure countermeasure implementation using prepared statements.
+At a high level, this project answers a practical engineering question:
 
-The result is a reproducible Oracle-backed lab environment that demonstrates two things clearly:
+**Can a hands-on SQL injection lab built for MySQL be migrated to Oracle Database 23ai without breaking the original user experience or the core security learning objective?**
 
-1. **Database migration alone does not remove insecure query construction.**
-2. **Prepared statements restore the intended separation between code and data.**
-3. <img width="975" height="312" alt="image" src="https://github.com/user-attachments/assets/49fcffc8-9b36-487d-a8ba-9e9489e59949" />
+The short answer is yes, but not through a simple database swap. Oracle introduced different runtime assumptions around database initialization, schema setup, PHP connectivity, SQL behavior, and statement execution. To make the lab usable again, the environment had to be redesigned around Dockerized startup, seeded Oracle data, OCI8 integration, and Oracle-aware validation. The final result is an Oracle-backed lab that demonstrates both the persistence of insecure query construction and the effectiveness of prepared statements as a defense.
 
-## Why this project matters
+<img width="975" height="312" alt="image" src="https://github.com/user-attachments/assets/ca1a49d6-8cdd-4637-a2d7-fc7634611656" />
 
-Many educational security labs are tightly coupled to one database engine. When moved to another platform, the UI might still look the same, but the backend assumptions often break. Oracle differs from MySQL in ways that directly affect reproducibility and attack behavior, including pluggable database setup, schema/user initialization requirements, OCI8-based connectivity, comment syntax, and single-statement execution behavior.
+## Why this project is interesting
 
-This project shows how to preserve the original learning experience while adapting the implementation to Oracle correctly and responsibly.
+Most security labs are tightly coupled to the platform they were originally built for. In this case, the original learning flow came from a MySQL-based SQL injection lab, but Oracle behaves differently in ways that matter for both functionality and security validation. According to the capstone report, the migration had to account for Oracle's pluggable database model, schema and user creation requirements, FREEPDB1 service usage, OCI8-based PHP connectivity, and Oracle-specific execution behavior. fileciteturn4file0L21-L28
 
-## What this repository demonstrates
+That makes this repository more than a classroom exercise. It is also a project in:
+- database migration
+- containerized environment design
+- backend integration with Oracle
+- reproducibility engineering
+- secure coding validation
 
-- Migration of a MySQL-based SQL injection lab to **Oracle Database 23ai**
-- Dockerized environment design for more repeatable setup and validation
-- Oracle-specific initialization using **FREEPDB1**, startup scripts, seeded data, and readiness checks
-- PHP/Apache integration with **Oracle Instant Client** and **OCI8**
-- Validation of vulnerable behavior through both browser-based and command-line request flows
-- Defensive rewrite using **prepared statements / bind variables**
-<img width="975" height="319" alt="image" src="https://github.com/user-attachments/assets/34adb1b9-c4bf-4657-94b8-e63e033e5ec8" />
 
-## Project goals
+### 1. original problem
 
-The main design goals of this project were:
+The original SQL injection lab was designed for MySQL, but the goal of this capstone was to recreate the same lab using Oracle Database 23ai while preserving the same user-facing workflow and learning objective. The report makes clear that the purpose was not to redesign the lab, but to keep the familiar experience while replacing the backend correctly. 
 
-- **Preserve the original learning flow** instead of redesigning the lab experience
-- **Make the setup reproducible** through Docker-based initialization and reduced manual configuration
-- **Adapt the backend correctly to Oracle** rather than forcing MySQL assumptions into a different engine
-- **Demonstrate both attack and defense** in the same Oracle-based environment
+### 2. Realize that Oracle changes the backend assumptions
 
-## Key engineering work
+Oracle could not be dropped in as a direct replacement. The environment had to be reworked to support Dockerized Oracle startup, persistent storage, initialization scripts, health checks, schema preparation, privilege assignment, and seeded data creation before the web layer could function reliably. 
 
-### 1) Oracle environment redesign
-The runtime was updated to include an Oracle database service, persistent storage, mounted startup scripts, and health checks so that the web container starts only after the database is ready.
+### 3. Rebuild the PHP application around OCI8
 
-### 2) Database initialization and seeding
-Because Oracle does not behave like the original MySQL-based environment, the lab required additional automation for schema preparation, privileges, and seeded credential data.
+The existing PHP application was adapted to communicate with Oracle through Oracle Instant Client and the OCI8 PHP extension. This preserved the front-end flow while replacing the connectivity layer behind it. 
+<img width="975" height="502" alt="image" src="https://github.com/user-attachments/assets/166c2cca-6f16-4f87-8b2e-16f1e010cff6" />
 
-### 3) OCI8-based PHP integration
-The web container was rebuilt to support Oracle Instant Client and the OCI8 PHP extension, allowing the existing PHP application flow to communicate with Oracle.
+### 4. Validate that the migrated lab still behaves like a lab
 
-### 4) Validation of vulnerable and defended paths
-The environment was validated for normal application behavior first, then used to reproduce vulnerable query flows and finally tested again after replacing string concatenation with prepared statements.
+Before testing any vulnerable behavior, the environment was validated through normal Oracle SQL operations, successful login, and profile rendering. The report also notes that Oracle-specific runtime behavior, such as case-sensitive matching, had to be accounted for during validation. 
 
-<img width="975" height="502" alt="image" src="https://github.com/user-attachments/assets/54963296-2214-420e-902d-63522b2d1703" />
+### 5. Show that migration does not remove insecure query construction
 
-## Technical highlights
+One of the most important outcomes of the project is that moving from MySQL to Oracle did **not** remove the vulnerability when queries were still built by string concatenation. The report shows that attack behavior had to be adapted to Oracle syntax and execution rules, but the underlying issue remained until the query construction method changed. 
 
-| Area | Oracle-based implementation |
+### 6. Close the loop with a proper defense
+
+The final phase implemented prepared statements so that user input would be treated as data rather than executable SQL. The report states that this restored the intended code/data separation and blocked the vulnerable behavior demonstrated earlier.
+
+This project demonstrates the ability to work across multiple layers of a system, not just one isolated feature.
+
+### Backend and platform engineering
+- Migrated a MySQL-oriented workflow to **Oracle Database 23ai**
+- Reworked initialization around **FREEPDB1**, schema creation, seeding, and readiness checks
+- Preserved application behavior while changing core backend assumptions
+
+### Application integration
+- Adapted a PHP/Apache application to use **Oracle Instant Client** and **OCI8**
+- Verified runtime behavior in both browser and command-line contexts
+- Traced vulnerability behavior back to query construction logic
+
+### Security engineering
+- Demonstrated why changing database engines alone does not fix insecure code
+- Compared vulnerable and defended implementations in the same environment
+- Implemented prepared-statement mitigation with Oracle-compatible query handling
+
+## Architecture at a glance
+
+| Layer | What this project implemented |
 |---|---|
 | Database | Oracle Database 23ai |
-| Oracle service | FREEPDB1 |
-| Application layer | PHP + Apache |
+| Service model | FREEPDB1-based Oracle setup |
+| Runtime | Docker / Docker Compose |
+| Web layer | PHP + Apache |
 | Oracle connectivity | OCI8 + Oracle Instant Client |
-| Environment | Docker / Docker Compose |
-| Initialization | Startup scripts, schema creation, seeded data |
-| Validation | Browser flow + command-line requests |
-| Defense | Prepared statements with bind variables |
+| Data setup | Initialization scripts, schema creation, seeded records |
+| Validation | Browser-based checks and command-line requests |
+| Mitigation | Prepared statements / bind variables |
 
-## High-level results
 
-The project confirmed that the migrated lab still supports the core learning outcomes of SQL injection education, but the attack form must be adapted to Oracle-specific behavior.
-
-At a high level, the results show that:
-
-- Normal login and profile rendering work in the Oracle-based environment
-- Vulnerable query construction remains exploitable when user input is concatenated into SQL
-- Oracle changes the syntax and execution assumptions, but not the existence of the core vulnerability
-- Prepared statements successfully block unauthorized data retrieval and restore intended query behavior
-
-<img width="788" height="278" alt="image" src="https://github.com/user-attachments/assets/0ee7a5dd-8fae-4f82-bed4-42ddb7331b2a" />
+One important part of the project was preserving the familiar application experience while changing the backend. The report explicitly states that the front-end web pages and overall user experience were kept as close as possible to the original lab so students could perform the same tasks without learning a new system. 
+<img width="975" height="319" alt="image" src="https://github.com/user-attachments/assets/c3584028-31e4-496b-810d-9454b7c7a9f4" />
+<img width="788" height="278" alt="image" src="https://github.com/user-attachments/assets/2f867766-80ea-411c-8147-473345e0a303" />
 
 ## What changed from MySQL to Oracle
 
-This project highlights an important engineering lesson: a migration can preserve features while still requiring deep backend changes.
+The strongest technical lesson in this repository is that the migration preserved the learning objective, but not the original backend assumptions. The report documents several Oracle-specific differences, including schema setup, OCI8-based connectivity, comment syntax differences, and single-statement execution behavior through `oci_parse()` and `oci_execute()`.
 
-| Topic | MySQL-oriented assumption | Oracle-based behavior observed in this project |
+| Area | MySQL-oriented expectation | Oracle-based reality in this project |
 |---|---|---|
-| Initialization | Pre-seeded lab environment | Additional schema/user setup and seed automation required |
-| Connectivity | Built-in MySQL-oriented runtime path | OCI8 and Oracle Instant Client required |
-| Comment behavior | MySQL-style payload assumptions | Oracle-compatible comment syntax required |
+| Initialization | Pre-seeded environment | Oracle startup, schema/user creation, and seed automation required |
+| Connectivity | Existing MySQL runtime path | OCI8 and Oracle Instant Client required |
+| SQL behavior | MySQL syntax assumptions | Oracle-compatible syntax and runtime handling required |
 | Statement execution | Stacked-query assumptions may be attempted | OCI8 executes one statement per parse/execute call |
-| Secure fix | Conceptually the same | Implemented using Oracle-compatible prepared statements |
+| Mitigation | Prepared statements conceptually solve the issue | Oracle-side bind-variable implementation confirmed the defense |
 
-This project is not only a security lab exercise. It also demonstrates:
+## Why the vulnerability still existed after migration
 
-- **Database migration engineering** across different execution models
-- **Containerized environment design** for reproducible setup
-- **Oracle integration work** in a PHP/Apache application stack
-- **Debugging and validation discipline** across UI, backend, and command-line paths
-- **Secure coding awareness** through bind-variable based mitigation
+A useful part of the project is that it does not stop at “the lab works.” It also explains **why** the vulnerability survives the migration. The code-level analysis in the report shows that the Oracle connection was correctly established through OCI8, but the vulnerable query path still used string concatenation, which preserved the insecure behavior.
+
+<img width="975" height="524" alt="image" src="https://github.com/user-attachments/assets/728ebd7a-9cec-43a6-a056-3ab6e2cb8f83" />
+
+## Results 
+
+The report's task summary is one of the best recruiter-facing visuals because it compresses the core project outcome into a single comparison: some MySQL-style assumptions fail in Oracle, but the vulnerability still exists when expressed in Oracle-compatible form, and prepared statements successfully block it. 
+
+<img width="752" height="627" alt="image" src="https://github.com/user-attachments/assets/f168c4cf-0da1-4776-bdd6-9ace98645425" />
 

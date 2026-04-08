@@ -110,3 +110,23 @@ The report's task summary is one of the best recruiter-facing visuals because it
 
 <img width="752" height="627" alt="image" src="https://github.com/user-attachments/assets/f168c4cf-0da1-4776-bdd6-9ace98645425" />
 
+## Defense and final outcome
+
+The report concludes that the prepared-statement phase preserved normal functionality while preventing unauthorized data retrieval and stopping user input from altering SQL logic. That final step is what makes the repository feel complete from an engineering standpoint: it shows the vulnerable system, explains the root cause, and demonstrates the fix in the same Oracle-based environment.
+
+<img width="975" height="325" alt="image" src="https://github.com/user-attachments/assets/7e0e490e-77e2-420c-99f2-f6eda442ddf6" />
+
+## Responsible use
+
+This repository is intended for education, secure coding awareness, and reproducible lab development. The public README stays high-level on purpose and does not provide a step-by-step exploit guide.
+
+## References
+
+1. Jeff Forristal (rain.forest.puppy). 1998. *NT Web Technology Vulnerabilities*. *Phrack Magazine* 8, 54 (Dec. 25, 1998). https://phrack.org/issues/54/8
+2. Wenliang Du. n.d. *SQL Injection Attack Lab*. SEED Labs. Retrieved April 7, 2026 from https://seedsecuritylabs.org/Labs_20.04/Web/Web_SQL_Injection/
+3. Oracle. n.d. *SQL Injection*. In *Oracle Database PL/SQL Language Reference, 26ai*. Retrieved April 7, 2026 from https://docs.oracle.com/en/database/oracle/oracle-database/26/lnpls/sql-injection.html
+
+
+## Acknowledgments
+
+I would like to sincerely thank my advisor, **Prof. Giovani Abuaitah**, for his guidance, support, and feedback throughout this capstone project.

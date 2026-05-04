@@ -1,0 +1,49 @@
+version: "3.8"
+
+services:
+  # Oracle DB replaces MySQL at 10.9.0.6 (so the lab network stays the same)
+  oracle:
+    image: container-registry.oracle.com/database/free:23.5.0.0
+    container_name: oracle-10.9.0.7
+    environment:
+      - ORACLE_PWD=dees
+      - ORACLE_SID=FREE
+      - ORACLE_PDB=FREEPDB1
+      - INIT_SGA_SIZE=512
+      - INIT_PGA_SIZE=256
+    shm_size: "2g"
+    volumes:
+      # persistent database files (like mysql_data)
+      - ./oracle_data:/opt/oracle/oradata
+      # startup scripts auto-run by this Oracle image
+      # make sure these files exist on your host
+      - ./image_oracle/init_oracle.sh:/opt/oracle/scripts/startup/01_init_oracle.sh:ro
+      - ./image_oracle/sqllab_users_oracle.sql:/opt/oracle/scripts/startup/02_sqllab_users_oracle.sql:ro
+    networks:
+      net-10.9.0.0:
+        ipv4_address: 10.9.0.7
+    healthcheck:
+      test: ["CMD-SHELL", "bash -lc \"echo 'SELECT 1 FROM dual;' | sqlplus -s seed/dees@//localhost:1521/FREEPDB1 >/dev/null 2>&1\""]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+
+  # SEED web container stays at 10.9.0.5
+  www:
+    build: ./image_www
+    image: seed-image-www-oracle
+    container_name: www-10.9.0.5
+    tty: true
+    depends_on:
+      oracle:
+        condition: service_healthy
+    networks:
+      net-10.9.0.0:
+        ipv4_address: 10.9.0.5
+
+networks:
+  net-10.9.0.0:
+    ipam:
+      config:
+        - subnet: 10.9.0.0/24
